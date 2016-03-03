@@ -5,11 +5,13 @@ class Scheduler
 {
     private $workweek;
     private $delay;
+    private $holidays;
 
-    public function __construct($workweek, $delay)
+    public function __construct($workweek, $delay, $holidays)
     {
         $this->workweek = $workweek;
         $this->delay = $delay;
+        $this->holidays = $holidays;
     }
 
     // Return the mail sending time for a given approval time
@@ -46,6 +48,9 @@ class Scheduler
         if (!isset($this->workweek[$day_of_week]) or empty($this->workweek[$day_of_week])) {
             return null;
         }
+        if (in_array($approval_time->format('Y-m-d'), $this->holidays)) {
+            return null;
+        }
         $blocks = $this->workweek[$day_of_week];
         foreach ($blocks as $block) {
             $block_start = new \DateTimeImmutable($approval_time->format('Y-m-d') . ' ' . $block['start']);
@@ -68,6 +73,10 @@ class Scheduler
         while ($next_block === null) {
             $day_of_week = (int)$from_time->format('N') - 1;
             while (!isset($this->workweek[$day_of_week]) or empty($this->workweek[$day_of_week])) {
+                $from_time = $from_time->add(new \DateInterval('P1D'))->setTime(0, 0);
+                $day_of_week = (int)$from_time->format('N') - 1;
+            }
+            while (in_array($from_time->format('Y-m-d'), $this->holidays)) {
                 $from_time = $from_time->add(new \DateInterval('P1D'))->setTime(0, 0);
                 $day_of_week = (int)$from_time->format('N') - 1;
             }

@@ -1,5 +1,8 @@
 {
 	"autoload": {
 		"psr-4": {"EdebexTest\\": "src/"}
+	},
+	"require": {
+		"sabre/vobject": "^4.0"
 	}
 }
