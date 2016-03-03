@@ -4,7 +4,7 @@ namespace EdebexTest;
 require 'vendor/autoload.php';
 
 if ($argc < 3) {
-    echo 'Usage: ' . $argv[0] . ' approval_times_file holidays_file' . PHP_EOL;
+    echo 'Usage: ' . $argv[0] . ' approval_times_file holidays_file [schedule_file]' . PHP_EOL;
     exit(1);
 }
 
@@ -16,7 +16,9 @@ $workweek = [
     [['start' => '09:00', 'stop' => '12:00', 'mail' => true], ['start' => '13:30', 'stop' => '17:00', 'mail' => false]] // fri
 ];
 $delay = 4; // hours
-
+if ($argc == 4) {
+    $workweek = \EdebexTest\WorkweekParser::fromFile($argv[3]);
+}
 $holidays = \EdebexTest\HolidaysParser::fromFile($argv[2]);
 $scheduler = new \EdebexTest\Scheduler($workweek, $delay, $holidays);
 foreach (file($argv[1]) as $line) {
